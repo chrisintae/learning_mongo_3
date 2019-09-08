@@ -13,8 +13,20 @@ server.route( [
     {
         method: 'GET',
         path: '/api/tours',
+        config: {json: {space: 2}}, // add formatting
         handler: function(request, reply) {
-            reply ("Getting tour list!");
+            // query parameters to add search functionality 
+            // create a findObject object and scan through the query parameters
+            // adding each one to the document to filter with
+            var findObject = {};
+            for (var key in request.query) {
+                findObject[key] = request.query[key]
+            }
+            // pass in findObject
+            collection.find(findObject).toArray(function(error, tours) {
+                assert.equal(null,error);
+                reply(tours);
+            })
         }
     },
     // Add new tour
