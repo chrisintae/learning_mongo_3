@@ -1,5 +1,4 @@
 var MongoClient = require('mongodb').MongoClient,
-    assert = require('assert'),
     Hapi = require('hapi');
 
 var url = 'mongodb://localhost:27017/learning_mongo'
@@ -14,16 +13,8 @@ server.route( [
     {
         method: 'GET',
         path: '/api/tours',
-        config: {json: {space: 2}},
         handler: function(request, reply) {
-            var findObject = {};
-            for (var key in request.query) {
-                findObject[key] = request.query[key]
-            }
-            collection.find(findObject).toArray(function(error, tours) {
-                assert.equal(null,error);
-                reply(tours);
-            })
+            reply ("Getting tour list!");
         }
     },
     // Add new tour
@@ -38,12 +29,8 @@ server.route( [
     {
         method: 'GET',
         path: '/api/tours/{name}',
-        config: {json: {space: 2}},
         handler: function(request, reply) {
-            collection.findOne({"tourName":request.params.name}, function(error, tour) {
-               assert.equal(null,error);
-               reply(tour);
-            })
+            reply ("Retrieving " + request.params.name);
         }
     },
     // Update a single tour
@@ -72,12 +59,3 @@ server.route( [
         }
     }
 ])
-
-MongoClient.connect(url, function(err, db) {
-    assert.equal(null,err);
-    console.log("connected correctly to server");
-    collection = db.collection('tours');
-    server.start(function(err) {
-        console.log('Hapi is listening to http://localhost:8080')
-    })
-})
