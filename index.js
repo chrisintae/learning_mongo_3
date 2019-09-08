@@ -75,3 +75,12 @@ server.route( [
         }
     }
 ])
+
+MongoClient.connect(url, function(err, db) {
+    console.log('Connected correctly to server');
+
+    collection = db.collection('tours');
+    server.start(function(err) {
+        console.log('Hapi is listening to http://localhost;')
+    })
+})
