@@ -13,18 +13,27 @@ server.route( [
     {
         method: 'GET',
         path: '/api/tours',
-        config: {json: {space: 2}}, // add formatting
+        config: {
+            json: {
+                space:2
+            },
+            state: {
+                parse: false, // parse and store in request.state
+                failAction: 'ignore' // may also be 'ignore' or 'log'
+            }
+        },
         handler: function(request, reply) {
             // query parameters to add search functionality 
             // create a findObject object and scan through the query parameters
             // adding each one to the document to filter with
             var findObject = {};
+            
             for (var key in request.query) {
                 findObject[key] = request.query[key]
             }
             // pass in findObject
             collection.find(findObject).toArray(function(error, tours) {
-                assert.equal(null,error);
+                // assert.equal(null,error);
                 reply(tours);
             })
         }
@@ -41,8 +50,17 @@ server.route( [
     {
         method: 'GET',
         path: '/api/tours/{name}',
+        config: {
+            json: {
+                space:2
+            },
+            state: {
+                parse: false,
+                failAction: 'ignore'
+            }
+        },
         handler: function(request, reply) {
-            //reply ("Retrieving " + request.params.name);
+            // reply ("Retrieving " + request.params.name);
 
             collection.findOne({"tourName":request.params.name}, function(err, tour) {
                 reply(tour);
@@ -77,10 +95,10 @@ server.route( [
 ])
 
 MongoClient.connect(url, function(err, db) {
-    console.log('Connected correctly to server');
+    console.log("connected correctly to server");
 
     collection = db.collection('tours');
     server.start(function(err) {
-        console.log('Hapi is listening to http://localhost;')
+        console.log('Hapi is listening to http://localhost:8080')
     })
 })
