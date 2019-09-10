@@ -43,7 +43,12 @@ server.route( [
         method: 'POST',
         path: '/api/tours',
         handler: function(request, reply) {
-            reply ("Adding new tour");
+            // reply ("Adding new tour");
+
+            collection.insertOne(request.payload, function(err, result) {
+                // request.payload contains all fields and values sent by client
+                reply(request.payload);
+            })
         }
     },
     // Get a single tour
@@ -73,7 +78,24 @@ server.route( [
         path: '/api/tours/{name}',
         handler: function(request, reply) {
             // request.payload variables
-            reply ("Updating " + request.params.name);
+            // reply ("Updating " + request.params.name);
+
+            if(request.query.replace == "true") {
+                request.payload.tourName = request.params.name;
+                collection.replaceOne({"tourName": request.params.name}, request.payload, function(err, result) {
+                    collection.findOne({"tourName": request.params.name}, function(err, result) {
+                        reply(result);
+                    })
+                })
+            } else {
+                collection.updateOne({tourName: request.params.name}, 
+                    {$set: request.payload}, function(err, result) {
+                        collection.findOne({"tourName": request.params.name}, function(err, result) {
+                            reply(result);
+                        })
+                    }
+                )
+            }
         }
     },
     // Delete a single tour
@@ -81,7 +103,12 @@ server.route( [
         method: 'DELETE',
         path: '/api/tours/{name}',
         handler: function(request, reply) {
-            reply ("Deleting " + request.params.name).code(204);
+            // reply ("Deleting " + request.params.name).code(204);
+
+            collection.deleteOne({tourName:request.params.name},
+            function(err, result) {
+                reply().code(204); // no content
+            })
         }
     },
     // Home page
